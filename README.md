@@ -1,8 +1,8 @@
-* Yesod.Content.PDF
+# Yesod.Content.PDF
 
 Library for serving PDF content from a Yesod application.
-Uses `wkhtmltopdf` command line tool to convert HTML pages to PDF documents.
-Requires that `wkhtmltopdf` is installed and on your PATH.
+
+The library calls the `wkhtmltopdf` command line tool to convert HTML pages to PDF documents, therefore it requires that `wkhtmltopdf` is installed and on your PATH.
 
 Example Usage:
 
