@@ -26,3 +26,4 @@ getItemR itemId = do
       html <- defaultLayout $(widgetFile "item")
       liftIO (html2PDF html)
 ```
+Available on [Hackage](https://hackage.haskell.org/package/yesod-content-pdf)
