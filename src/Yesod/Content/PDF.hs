@@ -12,6 +12,7 @@ import System.Process
 import System.IO.Temp
 import System.IO
 import System.IO.Unsafe
+import Network.URI
 
 type PDF = ByteString
 
@@ -33,14 +34,14 @@ instance ToTypedContent (IO PDF) where
 instance ToContent (IO PDF) where
   toContent = toContent . unsafePerformIO
 
--- | Use wkhtmltopdf to render a PDF given the URL to an HTML document
-url2PDF :: String -> IO PDF
-url2PDF url = withSystemTempFile "output.pdf" (url2PDF' url)
+-- | Use wkhtmltopdf to render a PDF given the URI pointing to an HTML document
+uri2PDF :: URI -> IO PDF
+uri2PDF uri = withSystemTempFile "output.pdf" $ uri2PDF' uri
 
-url2PDF' :: String -> FilePath -> Handle -> IO PDF
-url2PDF' url tempPDFFile tempHandle = do
+uri2PDF' :: URI -> FilePath -> Handle -> IO PDF
+uri2PDF' uri tempPDFFile tempHandle = do
   hClose tempHandle
-  (_,_,_, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", url, tempPDFFile])
+  (_,_,_, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", show uri, tempPDFFile])
   _ <- waitForProcess pHandle
   Data.ByteString.readFile tempPDFFile
 
