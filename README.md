@@ -27,3 +27,6 @@ getItemR itemId = do
       liftIO (html2PDF html)
 ```
 Available on [Hackage](https://hackage.haskell.org/package/yesod-content-pdf)
+
+Package is usable, but in early development so the API is unstable.
+Issues and Pull Requests welcome.
