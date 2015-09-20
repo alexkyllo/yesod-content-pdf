@@ -16,6 +16,7 @@ import Network.URI
 
 type PDF = ByteString
 
+-- | Provide MIME type "application/pdf" as a ContentType for Yesod
 typePDF :: ContentType
 typePDF = "application/pdf"
 
@@ -29,7 +30,7 @@ instance HasContentType (IO PDF) where
   getContentType _ = typePDF
 
 instance ToTypedContent (IO PDF) where
-  toTypedContent ioPDF = TypedContent typePDF $ toContent ioPDF
+  toTypedContent = TypedContent typePDF . toContent
 
 instance ToContent (IO PDF) where
   toContent = toContent . unsafePerformIO
@@ -37,24 +38,24 @@ instance ToContent (IO PDF) where
 -- | Use wkhtmltopdf to render a PDF given the URI pointing to an HTML document
 uri2PDF :: URI -> IO PDF
 uri2PDF uri = withSystemTempFile "output.pdf" $ uri2PDF' uri
-
-uri2PDF' :: URI -> FilePath -> Handle -> IO PDF
-uri2PDF' uri tempPDFFile tempHandle = do
-  hClose tempHandle
-  (_,_,_, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", show uri, tempPDFFile])
-  _ <- waitForProcess pHandle
-  Data.ByteString.readFile tempPDFFile
+  where
+    uri2PDF' :: URI -> FilePath -> Handle -> IO PDF
+    uri2PDF' uri tempPDFFile tempHandle = do
+      hClose tempHandle
+      (_,_,_, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", show uri, tempPDFFile])
+      _ <- waitForProcess pHandle
+      Data.ByteString.readFile tempPDFFile
 
 -- | Use wkhtmltopdf to render a PDF from an HTML (Text.Blaze.Html) type
 html2PDF :: Html -> IO PDF
 html2PDF html = withSystemTempFile "output.pdf" (html2PDF' html)
-
-html2PDF' :: Html -> FilePath -> Handle -> IO PDF
-html2PDF' html tempPDFFile tempPDFHandle = do
-  hClose tempPDFHandle
-  withSystemTempFile "input.html" $ \tempHtmlFile tempHtmlHandle -> do
-    System.IO.hPutStrLn tempHtmlHandle $ renderHtml html
-    hClose tempHtmlHandle
-    (_,_,_, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", tempHtmlFile, tempPDFFile])
-    _ <- waitForProcess pHandle
-    Data.ByteString.readFile tempPDFFile
+  where
+    html2PDF' :: Html -> FilePath -> Handle -> IO PDF
+    html2PDF' html tempPDFFile tempPDFHandle = do
+      hClose tempPDFHandle
+      withSystemTempFile "input.html" $ \tempHtmlFile tempHtmlHandle -> do
+        System.IO.hPutStrLn tempHtmlHandle $ renderHtml html
+        hClose tempHtmlHandle
+        (_,_,_, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", tempHtmlFile, tempPDFFile])
+        _ <- waitForProcess pHandle
+        Data.ByteString.readFile tempPDFFile
