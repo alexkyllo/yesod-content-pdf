@@ -10,6 +10,7 @@ module Yesod.Content.PDF
   ) where
 
 import Blaze.ByteString.Builder.ByteString
+import Control.Monad.IO.Class (MonadIO(..))
 import Data.ByteString
 import Data.Conduit
 import Network.URI
@@ -37,8 +38,8 @@ instance ToContent PDF where
     yield $ Chunk $ fromByteString bs
 
 -- | Use wkhtmltopdf to render a PDF given the URI pointing to an HTML document.
-uri2PDF :: URI -> IO PDF
-uri2PDF uri = withSystemTempFile "output.pdf" $ uri2PDF' uri
+uri2PDF :: MonadIO m => URI -> m PDF
+uri2PDF uri = liftIO $ withSystemTempFile "output.pdf" $ uri2PDF' uri
   where
     uri2PDF' :: URI -> FilePath -> Handle -> IO PDF
     uri2PDF' uri' tempPDFFile tempHandle = do
@@ -48,8 +49,8 @@ uri2PDF uri = withSystemTempFile "output.pdf" $ uri2PDF' uri
       PDF <$> Data.ByteString.readFile tempPDFFile
 
 -- | Use wkhtmltopdf to render a PDF from an HTML (Text.Blaze.Html) type.
-html2PDF :: Html -> IO PDF
-html2PDF html = withSystemTempFile "output.pdf" (html2PDF' html)
+html2PDF :: MonadIO m => Html -> m PDF
+html2PDF html = liftIO $ withSystemTempFile "output.pdf" (html2PDF' html)
   where
     html2PDF' :: Html -> FilePath -> Handle -> IO PDF
     html2PDF' html' tempPDFFile tempPDFHandle = do

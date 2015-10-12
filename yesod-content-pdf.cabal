@@ -30,6 +30,7 @@ library
                      , temporary
                      , yesod-core
                      , conduit
+                     , transformers
 
   default-language:    Haskell2010
 
