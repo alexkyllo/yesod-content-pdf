@@ -39,25 +39,24 @@ instance ToContent PDF where
 
 -- | Use wkhtmltopdf to render a PDF given the URI pointing to an HTML document.
 uri2PDF :: MonadIO m => URI -> m PDF
-uri2PDF uri = liftIO $ withSystemTempFile "output.pdf" $ uri2PDF' uri
-  where
-    uri2PDF' :: URI -> FilePath -> Handle -> IO PDF
-    uri2PDF' uri' tempPDFFile tempHandle = do
-      hClose tempHandle
-      (_,_,_, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", show uri', tempPDFFile])
-      _ <- waitForProcess pHandle
-      PDF <$> Data.ByteString.readFile tempPDFFile
+uri2PDF = wkhtmltopdf . flip ($) . show
 
 -- | Use wkhtmltopdf to render a PDF from an HTML (Text.Blaze.Html) type.
 html2PDF :: MonadIO m => Html -> m PDF
-html2PDF html = liftIO $ withSystemTempFile "output.pdf" (html2PDF' html)
-  where
-    html2PDF' :: Html -> FilePath -> Handle -> IO PDF
-    html2PDF' html' tempPDFFile tempPDFHandle = do
-      hClose tempPDFHandle
-      withSystemTempFile "input.html" $ \tempHtmlFile tempHtmlHandle -> do
-        System.IO.hPutStrLn tempHtmlHandle $ renderHtml html'
-        hClose tempHtmlHandle
-        (_,_,_, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", tempHtmlFile, tempPDFFile])
-        _ <- waitForProcess pHandle
-        PDF <$> Data.ByteString.readFile tempPDFFile
+html2PDF html =
+  wkhtmltopdf $ \inner ->
+  withSystemTempFile "input.html" $ \tempHtmlFp tempHtmlHandle -> do
+    System.IO.hPutStrLn tempHtmlHandle $ renderHtml html
+    hClose tempHtmlHandle
+    inner tempHtmlFp
+
+-- | (Internal) Call wkhtmltopdf.
+wkhtmltopdf :: MonadIO m => ((String -> IO PDF) -> IO PDF) -> m PDF
+wkhtmltopdf setupInput =
+  liftIO $
+  withSystemTempFile "output.pdf" $ \tempOutputFp tempOutputHandle -> do
+    hClose tempOutputHandle
+    setupInput $ \inputArg -> do
+      (_, _, _, pHandle) <- createProcess (proc "wkhtmltopdf" ["--quiet", inputArg, tempOutputFp])
+      _ <- waitForProcess pHandle
+      PDF <$> Data.ByteString.readFile tempOutputFp
