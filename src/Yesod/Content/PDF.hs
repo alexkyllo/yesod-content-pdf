@@ -8,17 +8,17 @@ module Yesod.Content.PDF
   , PDF(..)
   , typePDF
   ) where
-import Prelude
-import Yesod.Core.Content
+
+import Blaze.ByteString.Builder.ByteString
 import Data.ByteString
+import Data.Conduit
+import Network.URI
+import System.IO
+import System.IO.Temp
+import System.Process
 import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.String
-import Blaze.ByteString.Builder.ByteString
-import System.Process
-import System.IO.Temp
-import System.IO
-import Network.URI
-import Data.Conduit
+import Yesod.Core.Content
 
 newtype PDF = PDF ByteString
 
