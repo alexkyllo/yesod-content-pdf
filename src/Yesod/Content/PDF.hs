@@ -1,7 +1,13 @@
--- | Utilities for serving PDF from Yesod
---   Uses and depends on command line utility wkhtmltopdf to render PDF from HTML
-
-module Yesod.Content.PDF where
+-- | Utilities for serving PDF from Yesod.
+--   Uses and depends on command line utility wkhtmltopdf to render PDF from HTML.
+module Yesod.Content.PDF
+  ( -- * Conversion
+    uri2PDF
+  , html2PDF
+    -- * Data type
+  , PDF(..)
+  , typePDF
+  ) where
 import Prelude
 import Yesod.Core.Content
 import Data.ByteString
@@ -16,7 +22,7 @@ import Data.Conduit
 
 newtype PDF = PDF ByteString
 
--- | Provide MIME type "application/pdf" as a ContentType for Yesod
+-- | Provide MIME type "application/pdf" as a ContentType for Yesod.
 typePDF :: ContentType
 typePDF = "application/pdf"
 
@@ -30,7 +36,7 @@ instance ToContent PDF where
   toContent (PDF bs) = ContentSource $ do
     yield $ Chunk $ fromByteString bs
 
--- | Use wkhtmltopdf to render a PDF given the URI pointing to an HTML document
+-- | Use wkhtmltopdf to render a PDF given the URI pointing to an HTML document.
 uri2PDF :: URI -> IO PDF
 uri2PDF uri = withSystemTempFile "output.pdf" $ uri2PDF' uri
   where
@@ -41,7 +47,7 @@ uri2PDF uri = withSystemTempFile "output.pdf" $ uri2PDF' uri
       _ <- waitForProcess pHandle
       PDF <$> Data.ByteString.readFile tempPDFFile
 
--- | Use wkhtmltopdf to render a PDF from an HTML (Text.Blaze.Html) type
+-- | Use wkhtmltopdf to render a PDF from an HTML (Text.Blaze.Html) type.
 html2PDF :: Html -> IO PDF
 html2PDF html = withSystemTempFile "output.pdf" (html2PDF' html)
   where
