@@ -1,5 +1,5 @@
 name:                yesod-content-pdf
-version:             0.1.0.2
+version:             0.2.0.0
 synopsis:            PDF Content Type for Yesod
 description:         Please see README.md
 homepage:            https://github.com/alexkyllo/yesod-content-pdf#readme
@@ -30,6 +30,7 @@ library
                      , temporary
                      , yesod-core
                      , conduit
+                     , data-default
                      , transformers
 
   default-language:    Haskell2010
