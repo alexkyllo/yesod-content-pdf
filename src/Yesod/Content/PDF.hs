@@ -21,15 +21,13 @@ module Yesod.Content.PDF
   , wkMarginLeft
   , wkMarginRight
   , wkMarginTop
-  , wkBackground
-  , wkImages
-  , wkLocalFileAccess
   , wkZoom
   , PageSize(..)
   , Orientation(..)
   , UnitReal(..)
   ) where
 
+import Prelude
 import Blaze.ByteString.Builder.ByteString
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.ByteString
@@ -111,12 +109,6 @@ data WkhtmltopdfOptions =
       -- ^ Right margin size.
     , wkMarginTop       :: UnitReal
       -- ^ Top margin size.
-    , wkBackground      :: Bool
-      -- ^ Whether to print the background.
-    , wkImages          :: Bool
-      -- ^ Whether to print the images.
-    , wkLocalFileAccess :: Bool
-      -- ^ Whether the page should be allowed to access local files.
     , wkZoom            :: Double
       -- ^ Zoom factor.
     } deriving (Eq, Ord, Show)
@@ -134,9 +126,6 @@ instance Default WkhtmltopdfOptions where
     , wkMarginLeft      = Mm 0
     , wkMarginRight     = Mm 0
     , wkMarginTop       = Mm 10
-    , wkBackground      = True
-    , wkImages          = True
-    , wkLocalFileAccess = True
     , wkZoom            = 1
     }
 
@@ -169,11 +158,6 @@ instance ToArgs WkhtmltopdfOptions where
   toArgs opts =
       [ "--quiet"
       , if wkCollate    opts then "--collate"    else "--no-collate"
-      , if wkBackground opts then "--background" else "--no-background"
-      , if wkImages     opts then "--images"     else "--no-images"
-      , if wkLocalFileAccess opts
-          then "--enable-local-file-access"
-          else "--disable-local-file-access"
       , "--copies", show (wkCopies opts)
       , "--zoom",   show (wkZoom   opts)
       ] ++
