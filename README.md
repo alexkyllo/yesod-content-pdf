@@ -7,13 +7,15 @@ The library calls the `wkhtmltopdf` command line tool to convert HTML pages to P
 Example Usage:
 
 ```haskell
+-- html2PDF now takes an instance of WkhtmltopdfOptions, and a default instance is provided.
+-- html2PDF :: MonadIO m => WkhtmltopdfOptions -> Html -> m PDF
 
 -- using a dedicated handler function for serving PDF
 getItemPDFR :: ItemId -> Handler PDF
 getItemPDFR itemId = do
   item <- runDB $ get404 itemId
   html <- defaultLayout $(widgetFile "item")
-  liftIO (html2PDF html)
+  liftIO (html2PDF def html)
 
 -- using provideRep to respond to requests with Accept "application/pdf"
 getItemR :: ItemId -> Handler TypedContent
@@ -24,7 +26,7 @@ getItemR itemId = do
     provideRep $ return $ toJSON item               -- respond with application/json
     provideRep $ do                                 -- respond with application/pdf
       html <- defaultLayout $(widgetFile "item")
-      liftIO (html2PDF html)
+      liftIO (html2PDF def html)
 ```
 Available on [Hackage](https://hackage.haskell.org/package/yesod-content-pdf)
 
