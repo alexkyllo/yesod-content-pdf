@@ -31,6 +31,7 @@ import Prelude
 import Blaze.ByteString.Builder.ByteString
 import Control.Monad.IO.Class (MonadIO(..))
 import Data.ByteString
+import Data.ByteString.Builder (hPutBuilder)
 import Data.Conduit
 import Data.Default (Default(..))
 import Network.URI
@@ -38,7 +39,7 @@ import System.IO
 import System.IO.Temp
 import System.Process
 import Text.Blaze.Html
-import Text.Blaze.Html.Renderer.String
+import Text.Blaze.Html.Renderer.Utf8
 import Yesod.Core.Content
 
 newtype PDF = PDF ByteString
@@ -66,8 +67,10 @@ html2PDF :: MonadIO m => WkhtmltopdfOptions -> Html -> m PDF
 html2PDF opts html =
   wkhtmltopdf opts $ \inner ->
   withSystemTempFile "input.html" $ \tempHtmlFp tempHtmlHandle -> do
-    System.IO.hPutStrLn tempHtmlHandle $ renderHtml html
-    hClose tempHtmlHandle
+    hSetBinaryMode tempHtmlHandle True
+    hSetBuffering  tempHtmlHandle $ BlockBuffering Nothing
+    hPutBuilder    tempHtmlHandle $ renderHtmlBuilder html
+    hClose         tempHtmlHandle
     inner tempHtmlFp
 
 -- | (Internal) Call wkhtmltopdf.
