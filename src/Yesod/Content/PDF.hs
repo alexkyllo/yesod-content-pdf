@@ -42,7 +42,8 @@ import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.Utf8
 import Yesod.Core.Content
 
-newtype PDF = PDF ByteString
+newtype PDF = PDF { pdfBytes :: ByteString }
+            deriving (Eq, Ord, Read, Show)
 
 -- | Provide MIME type "application/pdf" as a ContentType for Yesod.
 typePDF :: ContentType
