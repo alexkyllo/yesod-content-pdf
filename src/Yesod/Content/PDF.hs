@@ -22,6 +22,7 @@ module Yesod.Content.PDF
   , wkMarginRight
   , wkMarginTop
   , wkZoom
+  , wkJavascriptDelay
   , PageSize(..)
   , Orientation(..)
   , UnitReal(..)
@@ -115,6 +116,8 @@ data WkhtmltopdfOptions =
       -- ^ Top margin size.
     , wkZoom            :: Double
       -- ^ Zoom factor.
+    , wkJavascriptDelay :: Int
+      -- ^ Time to wait for Javascript to finish in milliseconds.
     } deriving (Eq, Ord, Show)
 
 instance Default WkhtmltopdfOptions where
@@ -131,6 +134,7 @@ instance Default WkhtmltopdfOptions where
     , wkMarginRight     = Mm 0
     , wkMarginTop       = Mm 10
     , wkZoom            = 1
+    , wkJavascriptDelay = 200
     }
 
 -- | Cf. 'wkPageSize'.
@@ -164,6 +168,7 @@ instance ToArgs WkhtmltopdfOptions where
       , if wkCollate    opts then "--collate"    else "--no-collate"
       , "--copies", show (wkCopies opts)
       , "--zoom",   show (wkZoom   opts)
+      , "--javascript-delay", show (wkJavascriptDelay opts)
       ] ++
       Prelude.concat
        [ [ "--grayscale"  | True <- [wkGrayscale  opts] ]
