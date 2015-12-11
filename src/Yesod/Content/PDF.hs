@@ -165,9 +165,9 @@ class ToArgs a where
 instance ToArgs WkhtmltopdfOptions where
   toArgs opts =
       [ "--quiet"
-      , if wkCollate    opts then "--collate"    else "--no-collate"
-      , "--copies", show (wkCopies opts)
-      , "--zoom",   show (wkZoom   opts)
+      , if wkCollate opts then "--collate" else "--no-collate"
+      , "--copies",           show (wkCopies          opts)
+      , "--zoom",             show (wkZoom            opts)
       , "--javascript-delay", show (wkJavascriptDelay opts)
       ] ++
       Prelude.concat
