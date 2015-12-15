@@ -3,7 +3,6 @@
 module Yesod.Content.PDFSpec (main, spec) where
 
 import Test.Hspec
-import Test.Hspec.Expectations
 import Yesod.Content.PDF
 import Data.ByteString.UTF8 (toString)
 import Text.Blaze.Html
