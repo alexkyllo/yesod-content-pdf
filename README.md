@@ -1,5 +1,7 @@
 # Yesod.Content.PDF
 
+[![Build Status](https://travis-ci.org/alexkyllo/yesod-content-pdf.svg?branch=master)](https://travis-ci.org/alexkyllo/yesod-content-pdf)
+
 Library for serving PDF content from a Yesod application.
 
 The library calls the `wkhtmltopdf` command line tool to convert HTML pages to PDF documents, therefore it requires that `wkhtmltopdf` is installed and on your PATH. Tested with wkhtmltopdf versions 0.9.6 and 0.12.2.1.
