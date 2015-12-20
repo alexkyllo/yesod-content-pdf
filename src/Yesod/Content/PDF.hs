@@ -22,6 +22,7 @@ module Yesod.Content.PDF
   , wkMarginRight
   , wkMarginTop
   , wkZoom
+  , wkJavascriptDelay
   , PageSize(..)
   , Orientation(..)
   , UnitReal(..)
@@ -115,6 +116,8 @@ data WkhtmltopdfOptions =
       -- ^ Top margin size.
     , wkZoom            :: Double
       -- ^ Zoom factor.
+    , wkJavascriptDelay :: Maybe Int
+      -- ^ Time to wait for Javascript to finish in milliseconds.
     } deriving (Eq, Ord, Show)
 
 instance Default WkhtmltopdfOptions where
@@ -131,6 +134,7 @@ instance Default WkhtmltopdfOptions where
     , wkMarginRight     = Mm 0
     , wkMarginTop       = Mm 10
     , wkZoom            = 1
+    , wkJavascriptDelay = Nothing
     }
 
 -- | Cf. 'wkPageSize'.
@@ -161,7 +165,7 @@ class ToArgs a where
 instance ToArgs WkhtmltopdfOptions where
   toArgs opts =
       [ "--quiet"
-      , if wkCollate    opts then "--collate"    else "--no-collate"
+      , if wkCollate opts then "--collate" else "--no-collate"
       , "--copies", show (wkCopies opts)
       , "--zoom",   show (wkZoom   opts)
       ] ++
@@ -170,7 +174,8 @@ instance ToArgs WkhtmltopdfOptions where
        , [ "--lowquality" | True <- [wkLowQuality opts] ]
        , toArgs (wkPageSize    opts)
        , toArgs (wkOrientation opts)
-       , maybe [] (\t -> ["--title", t]) (wkTitle opts)
+       , maybe [] (\t -> ["--title",            t     ]) (wkTitle           opts)
+       , maybe [] (\d -> ["--javascript-delay", show d]) (wkJavascriptDelay opts)
        , "--margin-bottom" : toArgs (wkMarginBottom opts)
        , "--margin-left"   : toArgs (wkMarginLeft   opts)
        , "--margin-right"  : toArgs (wkMarginRight  opts)
