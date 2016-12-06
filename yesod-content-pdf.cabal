@@ -41,6 +41,7 @@ test-suite yesod-content-pdf-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   default-extensions:  OverloadedStrings
+  other-modules:       Yesod.Content.PDFSpec
   build-depends:       base
                      , yesod-content-pdf
                      , hspec
