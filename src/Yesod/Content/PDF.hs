@@ -16,6 +16,7 @@ module Yesod.Content.PDF
   , wkLowQuality
   , wkPageSize
   , wkOrientation
+  , wkDisableSmartShrinking
   , wkTitle
   , wkMarginBottom
   , wkMarginLeft
@@ -105,6 +106,8 @@ data WkhtmltopdfOptions =
       -- ^ Page size (e.g. "A4", "Letter").
     , wkOrientation     :: Orientation
       -- ^ Orientation of the output.
+    , wkDisableSmartShrinking  :: Bool
+      -- ^ Intelligent shrinking strategy used by WebKit that makes the pixel/dpi ratio none constant.
     , wkTitle           :: Maybe String
       -- ^ Title of the generated PDF file.
     , wkMarginBottom    :: UnitReal
@@ -125,20 +128,21 @@ data WkhtmltopdfOptions =
 
 instance Default WkhtmltopdfOptions where
   def = WkhtmltopdfOptions
-    { wkCollate         = True
-    , wkCopies          = 1
-    , wkGrayscale       = False
-    , wkLowQuality      = False
-    , wkPageSize        = A4
-    , wkOrientation     = Portrait
-    , wkTitle           = Nothing
-    , wkMarginBottom    = Mm 10
-    , wkMarginLeft      = Mm 0
-    , wkMarginRight     = Mm 0
-    , wkMarginTop       = Mm 10
-    , wkZoom            = 1
-    , wkJavascriptDelay = Nothing
-    , wkWindowStatus    = Nothing
+    { wkCollate               = True
+    , wkCopies                = 1
+    , wkGrayscale             = False
+    , wkLowQuality            = False
+    , wkPageSize              = A4
+    , wkOrientation           = Portrait
+    , wkDisableSmartShrinking = False
+    , wkTitle                 = Nothing
+    , wkMarginBottom          = Mm 10
+    , wkMarginLeft            = Mm 0
+    , wkMarginRight           = Mm 0
+    , wkMarginTop             = Mm 10
+    , wkZoom                  = 1
+    , wkJavascriptDelay       = Nothing
+    , wkWindowStatus          = Nothing
     }
 
 -- | Cf. 'wkPageSize'.
@@ -176,6 +180,7 @@ instance ToArgs WkhtmltopdfOptions where
       Prelude.concat
        [ [ "--grayscale"  | True <- [wkGrayscale  opts] ]
        , [ "--lowquality" | True <- [wkLowQuality opts] ]
+       , [ "--disable-smart-shrinking" | True <- [wkLowQuality opts] ]
        , toArgs (wkPageSize    opts)
        , toArgs (wkOrientation opts)
        , maybe [] (\t -> ["--title",            t     ]) (wkTitle           opts)
