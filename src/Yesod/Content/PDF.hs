@@ -180,7 +180,7 @@ instance ToArgs WkhtmltopdfOptions where
       Prelude.concat
        [ [ "--grayscale"  | True <- [wkGrayscale  opts] ]
        , [ "--lowquality" | True <- [wkLowQuality opts] ]
-       , [ "--disable-smart-shrinking" | True <- [wkLowQuality opts] ]
+       , [ "--disable-smart-shrinking" | True <- [wkDisableSmartShrinking opts] ]
        , toArgs (wkPageSize    opts)
        , toArgs (wkOrientation opts)
        , maybe [] (\t -> ["--title",            t     ]) (wkTitle           opts)
