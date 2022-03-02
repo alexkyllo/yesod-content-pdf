@@ -25,6 +25,8 @@ module Yesod.Content.PDF
   , wkZoom
   , wkJavascriptDelay
   , wkWindowStatus
+  , wkHeaderHtml
+  , wkFooterHtml
   , PageSize(..)
   , Orientation(..)
   , UnitReal(..)
@@ -124,6 +126,10 @@ data WkhtmltopdfOptions =
       -- ^ Time to wait for Javascript to finish in milliseconds.
     , wkWindowStatus    :: Maybe String
       -- ^ String to wait for window.status to be set to.
+    , wkHeaderHtml      :: Maybe String
+      -- ^ Add a html header
+    , wkFooterHtml      :: Maybe String
+      -- ^ Add a html footer
     } deriving (Eq, Ord, Show)
 
 instance Default WkhtmltopdfOptions where
@@ -143,6 +149,8 @@ instance Default WkhtmltopdfOptions where
     , wkZoom                  = 1
     , wkJavascriptDelay       = Nothing
     , wkWindowStatus          = Nothing
+    , wkHeaderHtml            = Nothing
+    , wkFooterHtml            = Nothing
     }
 
 -- | Cf. 'wkPageSize'.
@@ -186,6 +194,8 @@ instance ToArgs WkhtmltopdfOptions where
        , maybe [] (\t -> ["--title",            t     ]) (wkTitle           opts)
        , maybe [] (\d -> ["--javascript-delay", show d]) (wkJavascriptDelay opts)
        , maybe [] (\s -> ["--window-status",    s     ]) (wkWindowStatus    opts)
+       , maybe [] (\h -> ["--header-html",      h     ]) (wkHeaderHtml      opts)
+       , maybe [] (\f -> ["--footer-html",      f     ]) (wkFooterHtml      opts)
        , "--margin-bottom" : toArgs (wkMarginBottom opts)
        , "--margin-left"   : toArgs (wkMarginLeft   opts)
        , "--margin-right"  : toArgs (wkMarginRight  opts)
